@@ -1,18 +1,18 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
+//using System;
+//using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
+//using System.Linq;
 using System.Security;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+//using System.Text;
+//using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Data;
 using System.Data.OleDb;
-using System.Data.SqlClient;
+//using System.Data.SqlClient;
 
 namespace ACESinspectorCLI
 {
