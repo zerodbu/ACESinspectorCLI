@@ -20,22 +20,91 @@ namespace ACESinspectorCLI
 
         static int Main(string[] args)
         {
+
+            if (args.Length == 1)
+            {
+                Console.WriteLine("Version: " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                Console.WriteLine("usage: ACESinspectorCLI -i <ACES xml file> -v <VCdb access file> -p <PCdb access file> -q <Qdb access file> -o <assessment file> -t <temp directory>");
+                Console.WriteLine("\r\n optional switches");
+                Console.WriteLine("  --verbose    verbose console output");
+                Console.WriteLine("  --delete     delete input ACES file uppon successful analysis");
+                return 1;
+            }
+
             bool verbose = true;
+            bool deleteACESfileOnSuccess = true;
+
+            string inputFile = "";// @"G:\input\AmeriBRAKES.xml";
+            string VCdbFile = "";// @"G:\VCdb.accdb";
+            string PCdbFile = "";// @"G:\PCdb.accdb";
+            string QdbFile = "";// @"G:\Qdb.accdb";
+            string assessmentsPath = "";// @"G:\output";
+            string cachePath = "";// @"G:\temp";
 
             for (int i = 0; i < args.Length; i++)
             {
-                Console.WriteLine("*" + args[i] + "*");
+                if (args[i] == "--verbose") { verbose = true; }
+                if (args[i] == "--delete") { deleteACESfileOnSuccess = true; }
+                if (args[i] == "-i" && i < (args.Length-1)) {inputFile = args[i + 1]; }
+                if (args[i] == "-o" && i < (args.Length - 1)) { assessmentsPath = args[i + 1]; }
+                if (args[i] == "-t" && i < (args.Length - 1)) { cachePath = args[i + 1]; }
+                if (args[i] == "-v" && i < (args.Length - 1)) { VCdbFile = args[i + 1]; }
+                if (args[i] == "-p" && i < (args.Length - 1)) { PCdbFile = args[i + 1]; }
+                if (args[i] == "-q" && i < (args.Length - 1)) { QdbFile = args[i + 1]; }
             }
 
 
-            if (verbose) { Console.WriteLine("version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()); }
+            if (!File.Exists(inputFile))
+            {
+                Console.WriteLine("input ACES file ("+ inputFile + ") does not exist");
+                return 1;
+            }
 
-            string inputFile = @"C:\Users\Luke\Desktop\AIInput\ACES_4_1_MicroGard_cabin_filters_c2b8b442-9f43-4e2c-afd9-9a14b89ba551_FULL_2023-01-11.xml";
-            string VCdbFile = @"F:\backups\VCdb20230126.accdb";
-            string PCdbFile = @"F:\backups\PCdb20230126.accdb";
-            string QdbFile = @"F:\backups\Qdb20230126.accdb";
-            string cachePath = @"F:\backups";
-            string assessmentsPath = @"F:\backups";
+            if (!Directory.Exists(assessmentsPath))
+            {
+                Console.WriteLine("output directory (" + assessmentsPath + ") does not exist");
+                return 1;
+            }
+
+            if (Directory.Exists(cachePath))
+            {// temp directory exists - now see if the AiFragments folder exists and create it if not
+                if (!Directory.Exists(cachePath+"\\AiFragments"))
+                {
+                    try 
+                    {
+                        Directory.CreateDirectory(cachePath + "\\AiFragments");
+                    }
+                    catch (Exception ex)
+                    { 
+                        Console.WriteLine("failed to create AiFragments directory inside temp folder: " + ex.Message); return 1; 
+                    }
+                }
+            }
+            else 
+            {
+                Console.WriteLine("temp directory (" + cachePath + ") does not exist");
+                return 1;
+            }
+
+            if (!File.Exists(VCdbFile))
+            {
+                Console.WriteLine("VCdb Access database file (" + VCdbFile + ") does not exist");
+                return 1;
+            }
+
+            if (!File.Exists(PCdbFile))
+            {
+                Console.WriteLine("PCdb Access database file (" + PCdbFile + ") does not exist");
+                return 1;
+            }
+
+            if (!File.Exists(QdbFile))
+            {
+                Console.WriteLine("Qdb Access database file (" + QdbFile + ") does not exist");
+                return 1;
+            }
+
+            if (verbose) { Console.WriteLine("version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()); }
 
             List<string> cacheFilesToDeleteOnExit = new List<string>();
 
@@ -43,7 +112,6 @@ namespace ACESinspectorCLI
             bool reportAllAppsInProblemGroup = false;
             bool concernForDisparate = false;
             bool respectQdbType = false;
-            bool deleteACESfileOnSuccess = true;
             string macroProblemsDescription = "";
             int threadCount = 20;
             int treeConfigLimit = 1000;
@@ -55,7 +123,6 @@ namespace ACESinspectorCLI
             VCdb vcdb = new VCdb();     // this class will hold all the contents of the the imported VCdb M$Access file - mostly in "Dictionary" type variables for super-fast lookup (way faster than repeatedly querying the underlying Access file)
             PCdb pcdb = new PCdb();
             Qdb qdb = new Qdb();
-
 
             // hash the input file - temp fragment files are named including this hash which ensures a fragment that wasn't deleted from a past run can't confuse assessment results
             using (var md5 = MD5.Create())
@@ -679,23 +746,11 @@ namespace ACESinspectorCLI
                 }
             }
 
-
-
             return 0;
-
 
         }
 
-
-
-
-
-
-
-
     }
-
-
 
 }
 
