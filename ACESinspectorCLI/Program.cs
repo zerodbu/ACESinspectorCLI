@@ -1,8 +1,9 @@
 ﻿/*
  * Changes
  * 
- * 1.0.0.3 (2/28/2023) Defaulted to non-verbose console output and no delete of the input ACEC file on completion
- *       
+ * 1.0.0.3 (2/28/2023) Defaulted to non-verbose console output and no delete of the input ACEC file on completion. Brandcode added to output
+ * 1.0.0.4 (3/1/2023) Timespan runtime calulation
+ * 
  * 
  * 
  */
@@ -30,6 +31,7 @@ namespace ACESinspectorCLI
 
         static int Main(string[] args)
         {
+            DateTime startingDateTime = DateTime.Now;
 
             if (args.Length == 1)
             {
@@ -400,6 +402,12 @@ namespace ACESinspectorCLI
 
             if (verbose) { Console.WriteLine("writing assessment file"); }
 
+
+            DateTime endingDateTime = DateTime.Now;
+            TimeSpan runTime = endingDateTime - startingDateTime;
+
+
+
             // start building the assessment file
 
             string validatedAgainstVCdb = ""; if (aces.VcdbVersionDate != vcdb.version) { validatedAgainstVCdb = "analyzed against:" + vcdb.version; }
@@ -445,8 +453,8 @@ namespace ACESinspectorCLI
                     }
 
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">Qdb Utilization (%)</Data></Cell><Cell><Data ss:Type=\"Number\">" + aces.QdbUtilizationScore.ToString("0.00") + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
-                    sw.Write("<Row><Cell><Data ss:Type=\"String\">Validation tool</Data></Cell><Cell ss:StyleID=\"s64\" ss:HRef=\"https://https://github.com/autopartsource/ACESinspectorCLI\"><Data ss:Type=\"String\">ACESinspectorCLI version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
-                    sw.Write("<Row><Cell><Data ss:Type=\"String\">Processing Time</Data></Cell><Cell><Data ss:Type=\"Number\">" + Math.Round(Convert.ToDecimal(aces.analysisTime) / 5, 1).ToString() + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\">Seconds</Data></Cell></Row>");
+                    sw.Write("<Row><Cell><Data ss:Type=\"String\">Validation tool</Data></Cell><Cell ss:StyleID=\"s64\" ss:HRef=\"https://github.com/zerodbu/ACESinspectorCLI\"><Data ss:Type=\"String\">ACESinspectorCLI version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
+                    sw.Write("<Row><Cell><Data ss:Type=\"String\">Processing Time</Data></Cell><Cell><Data ss:Type=\"Number\">" + runTime.TotalMilliseconds.ToString() + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\">mS</Data></Cell></Row>");
                     sw.Write("</Table><WorksheetOptions xmlns=\"urn:schemas-microsoft-com:office:excel\"><PageSetup><Header x:Margin=\"0.3\"/><Footer x:Margin=\"0.3\"/><PageMargins x:Bottom=\"0.75\" x:Left=\"0.7\" x:Right=\"0.7\" x:Top=\"0.75\"/></PageSetup><Selected/><ProtectObjects>False</ProtectObjects><ProtectScenarios>False</ProtectScenarios></WorksheetOptions></Worksheet>");
 
                     sw.Write("<Worksheet ss:Name=\"Parts\"><Table ss:ExpandedColumnCount=\"4\" x:FullColumns=\"1\" x:FullRows=\"1\" ss:DefaultRowHeight=\"15\"><Column ss:Width=\"100\"/><Column ss:Width=\"100\"/><Column ss:Width=\"100\"/><Column ss:Width=\"100\"/><Row><Cell ss:StyleID=\"s65\"><Data ss:Type=\"String\">Part</Data></Cell><Cell ss:StyleID=\"s65\"><Data ss:Type=\"String\">Applications Count</Data></Cell><Cell ss:StyleID=\"s65\"><Data ss:Type=\"String\">Part Types</Data></Cell><Cell ss:StyleID=\"s65\"><Data ss:Type=\"String\">Positions</Data></Cell></Row>");

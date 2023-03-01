@@ -9,6 +9,8 @@
     <Company>AutoPartSource</Company>
     <Authors>Luke Smith</Authors>
     <AssemblyVersion>1.0.0.3</AssemblyVersion>
+    <IsPublishable>True</IsPublishable>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
   </PropertyGroup>
 
   <ItemGroup>
