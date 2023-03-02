@@ -33,7 +33,7 @@ namespace ACESinspectorCLI
         {
             DateTime startingDateTime = DateTime.Now;
 
-            if (args.Length == 1)
+            if (args.Length == 0)
             {
                 Console.WriteLine("Version: " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
                 Console.WriteLine("usage: ACESinspectorCLI -i <ACES xml file> -v <VCdb access file> -p <PCdb access file> -q <Qdb access file> -o <assessment file> -t <temp directory> [-l <logfile>]");
