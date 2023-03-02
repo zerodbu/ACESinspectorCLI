@@ -1,23 +1,15 @@
 ﻿using Microsoft.Win32;
-//using System;
-//using System.Collections.Generic;
 using System.Globalization;
-//using System.Linq;
 using System.Security;
 using System.Security.Cryptography;
-//using System.Text;
-//using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Data;
 using System.Data.OleDb;
-//using System.Data.SqlClient;
 
 namespace ACESinspectorCLI
 {
-
-
     public class Asset
     {
         public int id;
