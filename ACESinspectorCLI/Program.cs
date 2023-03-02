@@ -1,5 +1,6 @@
 ﻿/*
  * Changes
+ * 1.0.0.8 (3/1/2023) fixed logfile functionality
  * 1.0.0.7 (3/1/2023) fixed logfile functionality when none specified, added error counts to the log output
  * 1.0.0.6 (3/1/2023) added logfile functionality
  * 1.0.0.5 (3/1/2023) Round runtime to .1 seconds and display on console output
@@ -229,7 +230,7 @@ namespace ACESinspectorCLI
             if (importedAppsCount > 0)
             {
                 if (verbose) { Console.WriteLine("  Done (" + importedAppsCount.ToString() + " apps)"); }
-                File.AppendAllText(logFile, DateTime.Now.ToString() + "\tImported " + importedAppsCount.ToString() + " apps" + Environment.NewLine);
+                if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tImported " + importedAppsCount.ToString() + " apps" + Environment.NewLine); }
             }
             else
             { // something went wrong in the import
