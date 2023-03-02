@@ -1,5 +1,6 @@
 ﻿/*
  * Changes
+ * 1.0.0.7 (3/1/2023) fixed logfile functionality when none specified, added error counts to the log output
  * 1.0.0.6 (3/1/2023) added logfile functionality
  * 1.0.0.5 (3/1/2023) Round runtime to .1 seconds and display on console output
  * 1.0.0.4 (3/1/2023) Timespan runtime calulation
@@ -169,13 +170,13 @@ namespace ACESinspectorCLI
             }
 
             if (verbose) { Console.WriteLine("ACES file md5 hash: " + aces.fileMD5hash); }
-            File.AppendAllText(logFile, DateTime.Now.ToString() + "\tACES file:" + inputFile + Environment.NewLine);
-            File.AppendAllText(logFile, DateTime.Now.ToString() + "\tACES file md5 hash:" + aces.fileMD5hash + Environment.NewLine);
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tACES file:" + inputFile + Environment.NewLine); }
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tACES file md5 hash:" + aces.fileMD5hash + Environment.NewLine); }
 
             // load reference databases
 
             if (verbose) { Console.WriteLine("Importing VCdb: " + VCdbFile); }
-            File.AppendAllText(logFile, DateTime.Now.ToString() + "\tImporting VCdb: " + VCdbFile + Environment.NewLine);
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tImporting VCdb: " + VCdbFile + Environment.NewLine); }
 
             vcdb.clear();
             vcdb.connectLocalOLEDB(VCdbFile);
@@ -183,15 +184,15 @@ namespace ACESinspectorCLI
             if (!vcdb.importSuccess)
             {
                 if (verbose) { Console.WriteLine("  VCdb import failed: " + vcdb.importExceptionMessage); }
-                File.AppendAllText(logFile, DateTime.Now.ToString() + "\tVCdb import failed: " + vcdb.importExceptionMessage + Environment.NewLine);
+                if (logFile != ""){ File.AppendAllText(logFile, DateTime.Now.ToString() + "\tVCdb import failed: " + vcdb.importExceptionMessage + Environment.NewLine); }
                 return 1;
             }
             if (verbose) { Console.WriteLine("  Done (version date: " + vcdb.version + ")"); }
-            File.AppendAllText(logFile, DateTime.Now.ToString() + "\tSuccessful VCdb import (version date: " + vcdb.version + ")" + Environment.NewLine);
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tSuccessful VCdb import (version date: " + vcdb.version + ")" + Environment.NewLine); }
 
 
             if (verbose) { Console.WriteLine("Importing PCdb: " + PCdbFile); }
-            File.AppendAllText(logFile, DateTime.Now.ToString() + "\tImporting PCdb: " + PCdbFile + Environment.NewLine);
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tImporting PCdb: " + PCdbFile + Environment.NewLine); }
             pcdb.clear();
             pcdb.connectLocalOLEDB(PCdbFile);
             pcdb.importOLEdb();
@@ -201,27 +202,27 @@ namespace ACESinspectorCLI
                 return 1;
             }
             if (verbose) { Console.WriteLine("  Done PCdb (version date: " + pcdb.version + ")"); }
-            File.AppendAllText(logFile, DateTime.Now.ToString() + "\tSuccessful PCdb import (version date: " + pcdb.version + ")" + Environment.NewLine);
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tSuccessful PCdb import (version date: " + pcdb.version + ")" + Environment.NewLine); }
 
 
             if (verbose) { Console.WriteLine("Importing Qdb: " + QdbFile); }
-            File.AppendAllText(logFile, DateTime.Now.ToString() + "\tImporting Qdb: " + QdbFile + Environment.NewLine);
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tImporting Qdb: " + QdbFile + Environment.NewLine); }
             qdb.clear();
             qdb.connectLocalOLEDB(QdbFile);
             qdb.importOLEdb();
             if (!qdb.importSuccess)
             {
                 if (verbose) { Console.WriteLine("  Qdb import failed: " + qdb.importExceptionMessage); }
-                File.AppendAllText(logFile, DateTime.Now.ToString() + "\tQdb import failed: " + qdb.importExceptionMessage + Environment.NewLine);
+                if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tQdb import failed: " + qdb.importExceptionMessage + Environment.NewLine); }
                 return 1;
             }
             if (verbose) { Console.WriteLine("  Done Qdb (version date: " + qdb.version + ")"); }
-            File.AppendAllText(logFile, DateTime.Now.ToString() + "\tSuccessful Qdb import (version date: " + qdb.version + ")" + Environment.NewLine);
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tSuccessful Qdb import (version date: " + qdb.version + ")" + Environment.NewLine); }
 
             aces.clear();
 
             if (verbose) { Console.WriteLine("Importing ACES xml"); }
-            File.AppendAllText(logFile, DateTime.Now.ToString() + "\tStarting ACES file import:" + aces.filePath + Environment.NewLine);
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tStarting ACES file import:" + aces.filePath + Environment.NewLine); }
 
             int importedAppsCount = aces.importXML(inputFile, "", false, false, noteTranslationDictionary, noteToQdbTransformDictionary, vcdb);
 
@@ -234,7 +235,7 @@ namespace ACESinspectorCLI
             { // something went wrong in the import
 
                 if (verbose) { Console.WriteLine("Imported of XML file failed"); }
-                File.AppendAllText(logFile, DateTime.Now.ToString() + "\tACES file import failed: " + aces.xmlValidationErrors + Environment.NewLine);
+                if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tACES file import failed: " + aces.xmlValidationErrors + Environment.NewLine); }
                 return 1;
             }
 
@@ -417,6 +418,7 @@ namespace ACESinspectorCLI
             }
 
             if (verbose) { Console.WriteLine((aces.basevehicleidsErrorsCount + aces.vcdbCodesErrorsCount + aces.vcdbConfigurationsErrorsCount + aces.qdbErrorsCount + aces.parttypePositionErrorsCount).ToString() + " errors"); }
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\t" + (aces.basevehicleidsErrorsCount + aces.vcdbCodesErrorsCount + aces.vcdbConfigurationsErrorsCount + aces.qdbErrorsCount + aces.parttypePositionErrorsCount).ToString() + " errors" + Environment.NewLine); }
 
             List<string> problemsListTemp = new List<string>();
             if (aces.fitmentLogicProblemsCount > 0) { problemsListTemp.Add(aces.fitmentLogicProblemsCount.ToString() + " logic flaws"); }
@@ -433,7 +435,8 @@ namespace ACESinspectorCLI
             DateTime endingDateTime = DateTime.Now;
             TimeSpan runTime = endingDateTime - startingDateTime;
             if (verbose) { Console.WriteLine("run time: " + Math.Round(runTime.TotalMilliseconds/1000,1).ToString() + " seconds"); }
-            File.AppendAllText(logFile, DateTime.Now.ToString() + "\tAnalysis took " + Math.Round(runTime.TotalMilliseconds / 1000, 1).ToString() + " seconds" + Environment.NewLine);
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tAnalysis took " + Math.Round(runTime.TotalMilliseconds / 1000, 1).ToString() + " seconds" + Environment.NewLine); }
+
 
             // start building the assessment file
 
