@@ -1,5 +1,6 @@
 ﻿/*
  * Changes
+ * 1.0.0.11(3/3/2023) changed logging to a dedicated .log file in a logs directory for the given input file
  * 1.0.0.8 (3/1/2023) fixed logfile functionality
  * 1.0.0.7 (3/1/2023) fixed logfile functionality when none specified, added error counts to the log output
  * 1.0.0.6 (3/1/2023) added logfile functionality
@@ -29,6 +30,7 @@ namespace ACESinspectorCLI
             return outputString;
         }
 
+
         static int Main(string[] args)
         {
             DateTime startingDateTime = DateTime.Now;
@@ -36,7 +38,7 @@ namespace ACESinspectorCLI
             if (args.Length == 0)
             {
                 Console.WriteLine("Version: " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
-                Console.WriteLine("usage: ACESinspectorCLI -i <ACES xml file> -v <VCdb access file> -p <PCdb access file> -q <Qdb access file> -o <assessment file> -t <temp directory> [-l <logfile>]");
+                Console.WriteLine("usage: ACESinspectorCLI -i <ACES xml file> -v <VCdb access file> -p <PCdb access file> -q <Qdb access file> -o <assessment file> -t <temp directory> [-l <logs directory>]");
                 Console.WriteLine("\r\n optional switches");
                 Console.WriteLine("  --verbose    verbose console output");
                 Console.WriteLine("  --delete     delete input ACES file uppon successful analysis");
@@ -119,15 +121,15 @@ namespace ACESinspectorCLI
             }
 
             if (logFile != "")
-            {// logfile specified - test write to it
-
-                try 
-                {
-                    File.AppendAllText(logFile, DateTime.Now.ToString() + "\t--- Program version "+ System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + " started ---" + Environment.NewLine);
+            {// logs directory was specd. add the input aces filename to it with a .log ext
+                logFile = logFile + "\\" + Path.GetFileNameWithoutExtension(inputFile) + ".log";
+                try
+                { // write the file (potentially over-write) with one line of content to get the party started
+                    File.WriteAllText(logFile, DateTime.Now.ToString() + "\tVersion " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + " started" + Environment.NewLine);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error writing to log file: "+ex.Message);
+                    Console.WriteLine("Error writing to log file: " + ex.Message);
                     return 1;
                 }
             }
