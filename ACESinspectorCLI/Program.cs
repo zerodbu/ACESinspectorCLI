@@ -1,12 +1,14 @@
 ﻿/*
  * Changes
- * 1.0.0.11(3/3/2023) changed logging to a dedicated .log file in a logs directory for the given input file
- * 1.0.0.8 (3/1/2023) fixed logfile functionality
- * 1.0.0.7 (3/1/2023) fixed logfile functionality when none specified, added error counts to the log output
- * 1.0.0.6 (3/1/2023) added logfile functionality
- * 1.0.0.5 (3/1/2023) Round runtime to .1 seconds and display on console output
- * 1.0.0.4 (3/1/2023) Timespan runtime calulation
- * 1.0.0.3 (2/28/2023) Defaulted to non-verbose console output and no delete of the input ACEC file on completion. Brandcode added to output
+ * 1.0.0.12 (3/4/2023)  added baseVehicleIDs tab to spreadsheet output
+ * 1.0.0.11 (3/3/2023)  changed logging to a dedicated .log file in a logs directory for the given input file
+ * 1.0.0.8  (3/1/2023)  fixed logfile functionality
+ * 1.0.0.7  (3/1/2023)  fixed logfile functionality when none specified, added error counts to the log output
+ * 1.0.0.6  (3/1/2023)  added logfile functionality
+ * 1.0.0.5  (3/1/2023)  Round runtime to .1 seconds and display on console output
+ * 1.0.0.4  (3/1/2023)  Timespan runtime calulation
+ * 1.0.0.3  (2/28/2023) Defaulted to non-verbose console output and no delete of the input ACEC file on completion. Brandcode added to output
+ * 1.0.0.0  (2/27/2023) forked code from main ACESinspector (GUI) project at version 1.2.0.48
  */
 
 
@@ -451,6 +453,22 @@ namespace ACESinspectorCLI
             string assessmentFilename = assessmentsPath + "\\" + Path.GetFileNameWithoutExtension(aces.filePath) + "_assessment.xml";
 
 
+            // calculate basevehilce usage against vcdb's total possible basevehilce offering
+            int basevehicleHitcount = 0;
+            foreach (KeyValuePair<int, BaseVehicle> entry in vcdb.vcdbBasevhicleDict)
+            {
+                if (aces.basevidOccurrences.ContainsKey(entry.Key))
+                {
+                    //if ( Convert.ToInt32(entry.Value.YearId) >= 2016 && entry.Value.VehicleTypeName=="Car")
+                    //{
+                    //sw.WriteLine(entry.Key.ToString() + "\t" + entry.Value.MakeName + "\t" + entry.Value.ModelName + "\t" + entry.Value.YearId + "\t" + entry.Value.VehicleTypeName);
+                    basevehicleHitcount++;
+                    //}
+                }
+            }
+            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tBasevehicle coverage " + Math.Round(Convert.ToDouble(basevehicleHitcount*100) / (vcdb.vcdbBasevhicleDict.Count+1), 1).ToString() + "%  ("+ basevehicleHitcount + " used, " + vcdb.vcdbBasevhicleDict.Count + " available)" + Environment.NewLine); }
+
+
             try
             {
 
@@ -509,6 +527,12 @@ namespace ACESinspectorCLI
                         foreach (string distinctMfrLabel in aces.distinctMfrLabels) { sw.Write("<Row><Cell><Data ss:Type=\"String\">" + escapeXMLspecialChars(distinctMfrLabel) + "</Data></Cell></Row>"); }
                         sw.Write("</Table><WorksheetOptions xmlns=\"urn:schemas-microsoft-com:office:excel\"><PageSetup><Header x:Margin=\"0.3\"/><Footer x:Margin=\"0.3\"/><PageMargins x:Bottom=\"0.75\" x:Left=\"0.7\" x:Right=\"0.7\" x:Top=\"0.75\"/></PageSetup><ProtectObjects>False</ProtectObjects><ProtectScenarios>False</ProtectScenarios></WorksheetOptions></Worksheet>");
                     }
+
+                    sw.Write("<Worksheet ss:Name=\"BaseVehicleIDs\"><Table ss:ExpandedColumnCount=\"1\" x:FullColumns=\"1\" x:FullRows=\"1\" ss:DefaultRowHeight=\"15\"><Column ss:AutoFitWidth=\"0\" ss:Width=\"151.5\"/>");
+                    foreach (KeyValuePair<int,int> entry in aces.basevidOccurrences)
+                    { sw.Write("<Row><Cell><Data ss:Type=\"Number\">"+entry.Key.ToString()+"</Data></Cell></Row>"); 
+                    }
+                    sw.Write("</Table><WorksheetOptions xmlns=\"urn:schemas-microsoft-com:office:excel\"><PageSetup><Header x:Margin=\"0.3\"/><Footer x:Margin=\"0.3\"/><PageMargins x:Bottom=\"0.75\" x:Left=\"0.7\" x:Right=\"0.7\" x:Top=\"0.75\"/></PageSetup><ProtectObjects>False</ProtectObjects><ProtectScenarios>False</ProtectScenarios></WorksheetOptions></Worksheet>");
 
                     if (aces.noteCounts.Count > 0)
                     {
