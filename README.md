@@ -7,7 +7,7 @@ example command line call:
 ACESinspectorCLI -i "input\ACES file with spaces.xml" -o myOutputDir -t myTempDir -l myLogsDir -v VCdb20230126.accdb -p PCdb20230126.accdb -q Qdb20230126.accdb --delete --verbose
 
 
-An analysiss spreadsheet will be produced in the specified output directory. Detailed logging is done (oe log file per run, named to match the input ACES file) will be done to the specified logs directory
+An analysiss spreadsheet will be produced in the specified output directory. Optional logging (one logfile per run, named to match the input ACES file) will be written to the specified logs directory.
 
 
 Return values (int) from the command call
