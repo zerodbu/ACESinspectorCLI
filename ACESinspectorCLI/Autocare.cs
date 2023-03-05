@@ -833,6 +833,7 @@ namespace ACESinspectorCLI
         public Dictionary<string, List<int>> partsPositions = new Dictionary<string, List<int>>();
         public Dictionary<string, int> noteCounts = new Dictionary<string, int>();
         public Dictionary<int, int> basevidOccurrences = new Dictionary<int, int>();
+        public Dictionary<int, int> qdbidOccurrences = new Dictionary<int, int>();
         public List<string> distinctAssets = new List<string>();
         public List<string> distinctMfrLabels = new List<string>();
         public List<int> distinctPartTypes = new List<int>();
@@ -926,6 +927,7 @@ namespace ACESinspectorCLI
             distinctMfrLabels.Clear();
             distinctAssets.Clear();
             basevidOccurrences.Clear();
+            qdbidOccurrences.Clear();
             partsPartTypes.Clear();
             partsPositions.Clear();
             qdbErrorsCount = 0;
@@ -3529,6 +3531,15 @@ namespace ACESinspectorCLI
                             }
                         }
                         if (!foundExistingQdbQualifier) { appTemp.QdbQualifiers.Add(QdbQualifierTemp); }
+
+                        if (!qdbidOccurrences.ContainsKey(QdbQualifierTemp.qualifierId))
+                        {// first time seeing this qdbid
+                            qdbidOccurrences.Add(QdbQualifierTemp.qualifierId, 1);
+                        }
+                        else
+                        {// seen this qdbid before
+                            qdbidOccurrences[QdbQualifierTemp.qualifierId]++;
+                        }
                     }
 
                     // see if any of the note strings in the app have Qdb transforms defined
