@@ -1,5 +1,6 @@
 ﻿/*
  * Changes
+ * 1.0.0.15 (3/5/2023)  added modersn (1990+) basevid usage calculation
  * 1.0.0.14 (3/4/2023)  added basevid and qdb usage tabs to spreadsheet
  * 1.0.0.13 (3/4/2023)  defined return values of command call. Refined log output
  * 1.0.0.12 (3/4/2023)  added baseVehicleIDs tab to spreadsheet output
@@ -485,29 +486,35 @@ namespace ACESinspectorCLI
 
             string assessmentFilename = assessmentsPath + "\\" + Path.GetFileNameWithoutExtension(aces.filePath) + "_assessment.xml";
 
-
             // calculate basevehilce usage against vcdb's total possible basevehilce offering
             int basevehicleHitcount = 0;
+            int modernBasevehicleHitcount = 0;
+            int modernBasevehiclesAvail = 0;
             foreach (KeyValuePair<int, BaseVehicle> entry in vcdb.vcdbBasevhicleDict)
             {
+                if (Convert.ToInt32(entry.Value.YearId) >= 1990) { modernBasevehiclesAvail++; }
+
                 if (aces.basevidOccurrences.ContainsKey(entry.Key))
                 {
-                    //if ( Convert.ToInt32(entry.Value.YearId) >= 2016 && entry.Value.VehicleTypeName=="Car")
-                    //{
-                    //sw.WriteLine(entry.Key.ToString() + "\t" + entry.Value.MakeName + "\t" + entry.Value.ModelName + "\t" + entry.Value.YearId + "\t" + entry.Value.VehicleTypeName);
                     basevehicleHitcount++;
-                    //}
+                    if ( Convert.ToInt32(entry.Value.YearId) >= 1990) // && entry.Value.VehicleTypeName=="Car"
+                    {
+                        //sw.WriteLine(entry.Key.ToString() + "\t" + entry.Value.MakeName + "\t" + entry.Value.ModelName + "\t" + entry.Value.YearId + "\t" + entry.Value.VehicleTypeName);
+                        modernBasevehicleHitcount++;
+                    }
                 }
             }
-            if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tBasevehicle coverage " + Math.Round(Convert.ToDouble(basevehicleHitcount*100) / (vcdb.vcdbBasevhicleDict.Count+1), 1).ToString() + "%  ("+ basevehicleHitcount + " used, " + vcdb.vcdbBasevhicleDict.Count + " available)" + Environment.NewLine); }
-
+            if (logFile != "") 
+            {
+                File.AppendAllText(logFile, DateTime.Now.ToString() + "\tBasevehicle coverage (all years) " + Math.Round(Convert.ToDouble(basevehicleHitcount * 100) / (vcdb.vcdbBasevhicleDict.Count + 1), 1).ToString() + "%  (" + basevehicleHitcount + " used, " + vcdb.vcdbBasevhicleDict.Count + " available)" + Environment.NewLine);
+                File.AppendAllText(logFile, DateTime.Now.ToString() + "\tBasevehicle coverage (1990+) " + Math.Round(Convert.ToDouble(modernBasevehicleHitcount * 100) / (modernBasevehiclesAvail + 1), 1).ToString() + "%  (" + modernBasevehicleHitcount + " used, " + modernBasevehiclesAvail + " available)" + Environment.NewLine);
+            }
 
             try
             {
-
                 using (StreamWriter sw = new StreamWriter(assessmentFilename))
                 {
-                    sw.Write("<?xml version=\"1.0\"?><?mso-application progid=\"Excel.Sheet\"?><Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\" xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\" xmlns:html=\"http://www.w3.org/TR/REC-html40\"><DocumentProperties xmlns=\"urn:schemas-microsoft-com:office:office\"><Author>ACESinspector</Author><LastAuthor>ACESinspector</LastAuthor><Created>2017-02-20T01:10:23Z</Created><LastSaved>2017-02-20T02:49:36Z</LastSaved><Version>14.00</Version></DocumentProperties><OfficeDocumentSettings xmlns=\"urn:schemas-microsoft-com:office:office\"><AllowPNG/></OfficeDocumentSettings><ExcelWorkbook xmlns=\"urn:schemas-microsoft-com:office:excel\"><WindowHeight>7500</WindowHeight><WindowWidth>15315</WindowWidth><WindowTopX>120</WindowTopX><WindowTopY>150</WindowTopY><TabRatio>785</TabRatio><ProtectStructure>False</ProtectStructure><ProtectWindows>False</ProtectWindows></ExcelWorkbook><Styles><Style ss:ID=\"Default\" ss:Name=\"Normal\"><Alignment ss:Vertical=\"Bottom\"/><Borders/><Font ss:FontName=\"Calibri\" x:Family=\"Swiss\" ss:Size=\"11\" ss:Color=\"#000000\"/><Interior/><NumberFormat/><Protection/></Style><Style ss:ID=\"s62\"><NumberFormat ss:Format=\"Short Date\"/></Style><Style ss:ID=\"s64\" ss:Name=\"Hyperlink\"><Font ss:FontName=\"Calibri\" x:Family=\"Swiss\" ss:Size=\"11\" ss:Color=\"#0000FF\" ss:Underline=\"Single\"/></Style><Style ss:ID=\"s65\"><Font ss:FontName=\"Calibri\" x:Family=\"Swiss\" ss:Size=\"11\" ss:Color=\"#000000\" ss:Bold=\"1\"/><Interior ss:Color=\"#D9D9D9\" ss:Pattern=\"Solid\"/></Style></Styles><Worksheet ss:Name=\"Stats\"><Table ss:ExpandedColumnCount=\"3\" x:FullColumns=\"1\" x:FullRows=\"1\" ss:DefaultRowHeight=\"15\"><Column ss:Width=\"140\"/><Column ss:Width=\"171\"/><Column ss:Width=\"144\"/>");
+                    sw.Write("<?xml version=\"1.0\"?><?mso-application progid=\"Excel.Sheet\"?><Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\" xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\" xmlns:html=\"http://www.w3.org/TR/REC-html40\"><DocumentProperties xmlns=\"urn:schemas-microsoft-com:office:office\"><Author>ACESinspector</Author><LastAuthor>ACESinspector</LastAuthor><Created>2017-02-20T01:10:23Z</Created><LastSaved>2017-02-20T02:49:36Z</LastSaved><Version>14.00</Version></DocumentProperties><OfficeDocumentSettings xmlns=\"urn:schemas-microsoft-com:office:office\"><AllowPNG/></OfficeDocumentSettings><ExcelWorkbook xmlns=\"urn:schemas-microsoft-com:office:excel\"><WindowHeight>7500</WindowHeight><WindowWidth>15315</WindowWidth><WindowTopX>120</WindowTopX><WindowTopY>150</WindowTopY><TabRatio>785</TabRatio><ProtectStructure>False</ProtectStructure><ProtectWindows>False</ProtectWindows></ExcelWorkbook><Styles><Style ss:ID=\"Default\" ss:Name=\"Normal\"><Alignment ss:Vertical=\"Bottom\"/><Borders/><Font ss:FontName=\"Calibri\" x:Family=\"Swiss\" ss:Size=\"11\" ss:Color=\"#000000\"/><Interior/><NumberFormat/><Protection/></Style><Style ss:ID=\"s62\"><NumberFormat ss:Format=\"Short Date\"/></Style><Style ss:ID=\"s64\" ss:Name=\"Hyperlink\"><Font ss:FontName=\"Calibri\" x:Family=\"Swiss\" ss:Size=\"11\" ss:Color=\"#0000FF\" ss:Underline=\"Single\"/></Style><Style ss:ID=\"s65\"><Font ss:FontName=\"Calibri\" x:Family=\"Swiss\" ss:Size=\"11\" ss:Color=\"#000000\" ss:Bold=\"1\"/><Interior ss:Color=\"#D9D9D9\" ss:Pattern=\"Solid\"/></Style></Styles><Worksheet ss:Name=\"Stats\"><Table ss:ExpandedColumnCount=\"3\" x:FullColumns=\"1\" x:FullRows=\"1\" ss:DefaultRowHeight=\"15\"><Column ss:Width=\"170\"/><Column ss:Width=\"171\"/><Column ss:Width=\"144\"/>");
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">Input Filename</Data></Cell><Cell><Data ss:Type=\"String\">" + Path.GetFileName(aces.filePath) + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">Title</Data></Cell><Cell><Data ss:Type=\"String\">" + aces.DocumentTitle + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">Brand</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\">" + aces.BrandAAIAID + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
@@ -537,7 +544,8 @@ namespace ACESinspectorCLI
                     }
 
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">Qdb Utilization (%)</Data></Cell><Cell><Data ss:Type=\"Number\">" + aces.QdbUtilizationScore.ToString("0.00") + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
-                    sw.Write("<Row><Cell><Data ss:Type=\"String\">BaseVehilce Coverage (%)</Data></Cell><Cell><Data ss:Type=\"Number\">" + Math.Round(Convert.ToDouble(basevehicleHitcount * 100) / (vcdb.vcdbBasevhicleDict.Count + 1), 1).ToString("0.00") + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\">"+ basevehicleHitcount.ToString() + " used, " + vcdb.vcdbBasevhicleDict.Count.ToString() + " available" + "</Data></Cell></Row>");
+                    sw.Write("<Row><Cell><Data ss:Type=\"String\">All BaseVehilce Coverage (%)</Data></Cell><Cell><Data ss:Type=\"Number\">" + Math.Round(Convert.ToDouble(basevehicleHitcount * 100) / (vcdb.vcdbBasevhicleDict.Count + 1), 1).ToString("0.00") + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\">" + basevehicleHitcount.ToString() + " used, " + vcdb.vcdbBasevhicleDict.Count.ToString() + " available" + "</Data></Cell></Row>");
+                    sw.Write("<Row><Cell><Data ss:Type=\"String\">1990+ BaseVehilce Coverage (%)</Data></Cell><Cell><Data ss:Type=\"Number\">" + Math.Round(Convert.ToDouble(modernBasevehicleHitcount * 100) / (modernBasevehiclesAvail + 1), 1).ToString("0.00") + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\">" + modernBasevehicleHitcount.ToString() + " used, " + modernBasevehiclesAvail.ToString() + " available" + "</Data></Cell></Row>");
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">Validation tool</Data></Cell><Cell ss:StyleID=\"s64\" ss:HRef=\"https://github.com/zerodbu/ACESinspectorCLI\"><Data ss:Type=\"String\">ACESinspectorCLI version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">Processing Time (Seconds)</Data></Cell><Cell><Data ss:Type=\"Number\">" + Math.Round(runTime.TotalMilliseconds / 1000, 1).ToString() + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
                     sw.Write("</Table><WorksheetOptions xmlns=\"urn:schemas-microsoft-com:office:excel\"><PageSetup><Header x:Margin=\"0.3\"/><Footer x:Margin=\"0.3\"/><PageMargins x:Bottom=\"0.75\" x:Left=\"0.7\" x:Right=\"0.7\" x:Top=\"0.75\"/></PageSetup><Selected/><ProtectObjects>False</ProtectObjects><ProtectScenarios>False</ProtectScenarios></WorksheetOptions></Worksheet>");
