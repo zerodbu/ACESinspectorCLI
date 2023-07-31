@@ -107,6 +107,9 @@ namespace ACESinspectorCLI
         public bool hasBeenValidated;
         public List<validationProblem> problemsFound;
         public string hash;
+        public string brand;
+        public string subbrand;
+
 
         public App()
         {
@@ -207,7 +210,7 @@ namespace ACESinspectorCLI
             string result = "";
             using (MD5 md5Hash = MD5.Create())
             {
-                byte[] data = md5Hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(basevehilceid.ToString() + parttypeid.ToString() + positionid.ToString() + quantity.ToString() + namevalpairString(true) + rawQdbDataString() + mfrlabel + part + asset + assetitemorder.ToString()));
+                byte[] data = md5Hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(basevehilceid.ToString() + parttypeid.ToString() + positionid.ToString() + quantity.ToString() + namevalpairString(true) + rawQdbDataString() + mfrlabel + part + asset + assetitemorder.ToString() + brand + subbrand));
                 for (int i = 0; i < data.Length; i++) { result += data[i].ToString("x2"); }
             }
             return result;
@@ -1526,11 +1529,11 @@ namespace ACESinspectorCLI
                 if (app.action == "D") { continue; } // ignore "Delete" apps
                 if (treatAssetsAsFitment)
                 {
-                    hashkey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid + "\t" + app.mfrlabel + "\t" + app.asset + "\t" + app.assetitemorder + "\t" + app.assetitemref;
+                    hashkey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid + "\t" + app.mfrlabel + "\t" + app.asset + "\t" + app.assetitemorder + "\t" + app.assetitemref + "\t" + app.brand + "\t" + app.subbrand;
                 }
                 else
                 {
-                    hashkey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid + "\t" + app.mfrlabel;
+                    hashkey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid + "\t" + app.mfrlabel + "\t" + app.brand + "\t" + app.subbrand;
                 }
 
                 if (fitmentTreeHashtable.ContainsKey(hashkey)) { App appTemp = new App(); appTemp = app; fitmentTreeHashtable[hashkey].Add(appTemp); }
@@ -2726,7 +2729,7 @@ namespace ACESinspectorCLI
             foreach (App app in primearyaces.apps)
             {
                 if (app.action == "D") { continue; } // ignore "Delete" apps
-                hashKey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid.ToString() + "\t" + app.niceFullFitmentString(vcdb, qdb) + "\t" + app.mfrlabel;
+                hashKey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid.ToString() + "\t" + app.niceFullFitmentString(vcdb, qdb) + "\t" + app.mfrlabel + "\t" + app.brand + "\t" + app.subbrand;
                 if (!primaryvehicles.ContainsKey(hashKey)) { primaryvehicles.Add(hashKey, 0); }
             }
             if (progress != null) { percentProgress = 15; progress.Report(percentProgress); }
@@ -2754,14 +2757,14 @@ namespace ACESinspectorCLI
             foreach (App app in primearyaces.apps)
             {
                 if (app.action == "D") { continue; } // ignore "Delete" apps
-                hashKey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid.ToString() + "\t" + app.quantity.ToString() + "\t" + app.niceFullFitmentString(vcdb, qdb) + "\t" + app.mfrlabel + "\t" + app.part + "\t" + app.asset + "\t" + app.assetitemorder.ToString();
+                hashKey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid.ToString() + "\t" + app.quantity.ToString() + "\t" + app.niceFullFitmentString(vcdb, qdb) + "\t" + app.mfrlabel + "\t" + app.part + "\t" + app.asset + "\t" + app.assetitemorder.ToString() + "\t" + app.brand + "\t" + app.subbrand;
                 if (!primaryApps.ContainsKey(hashKey)) { primaryApps.Add(hashKey, 0); }
             }
             if (progress != null) { percentProgress = 40; progress.Report(percentProgress); }
             foreach (App app in refaces.apps)
             {
                 if (app.action == "D") { continue; } // ignore "Delete" apps
-                hashKey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid.ToString() + "\t" + app.quantity.ToString() + "\t" + app.niceFullFitmentString(vcdb, qdb) + "\t" + app.mfrlabel + "\t" + app.part + "\t" + app.asset + "\t" + app.assetitemorder.ToString();
+                hashKey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid.ToString() + "\t" + app.quantity.ToString() + "\t" + app.niceFullFitmentString(vcdb, qdb) + "\t" + app.mfrlabel + "\t" + app.part + "\t" + app.asset + "\t" + app.assetitemorder.ToString() + "\t" + app.brand + "\t" + app.subbrand;
                 if (!refApps.ContainsKey(hashKey)) { refApps.Add(hashKey, 0); }
             }
             if (progress != null) { percentProgress = 70; progress.Report(percentProgress); }
@@ -2770,7 +2773,7 @@ namespace ACESinspectorCLI
             foreach (App app in primearyaces.apps)
             {
                 if (app.action == "D") { continue; } // ignore "Delete" apps
-                hashKey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid.ToString() + "\t" + app.quantity.ToString() + "\t" + app.niceFullFitmentString(vcdb, qdb) + "\t" + app.mfrlabel + "\t" + app.part + "\t" + app.asset + "\t" + app.assetitemorder.ToString();
+                hashKey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid.ToString() + "\t" + app.quantity.ToString() + "\t" + app.niceFullFitmentString(vcdb, qdb) + "\t" + app.mfrlabel + "\t" + app.part + "\t" + app.asset + "\t" + app.assetitemorder.ToString() + "\t" + app.brand + "\t" + app.subbrand;
                 if (!refApps.ContainsKey(hashKey))
                 {
                     App addApp = new App();
@@ -2789,6 +2792,8 @@ namespace ACESinspectorCLI
                     addApp.QdbQualifiers = app.QdbQualifiers;
                     addApp.quantity = app.quantity;
                     addApp.VCdbAttributes = app.VCdbAttributes;
+                    addApp.brand = app.brand;
+                    addApp.subbrand = app.subbrand;
 
                     this.apps.Add(addApp);
                 }
@@ -2797,7 +2802,7 @@ namespace ACESinspectorCLI
             foreach (App app in refaces.apps)
             {
                 if (app.action == "D") { continue; } // ignore "Delete" apps
-                hashKey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid.ToString() + "\t" + app.quantity.ToString() + "\t" + app.niceFullFitmentString(vcdb, qdb) + "\t" + app.mfrlabel + "\t" + app.part + "\t" + app.asset + "\t" + app.assetitemorder.ToString();
+                hashKey = app.basevehilceid.ToString() + "\t" + app.parttypeid.ToString() + "\t" + app.positionid.ToString() + "\t" + app.quantity.ToString() + "\t" + app.niceFullFitmentString(vcdb, qdb) + "\t" + app.mfrlabel + "\t" + app.part + "\t" + app.asset + "\t" + app.assetitemorder.ToString() + "\t" + app.brand + "\t" + app.subbrand;
                 if (!primaryApps.ContainsKey(hashKey))
                 {
                     App dropApp = new App();
@@ -2816,6 +2821,9 @@ namespace ACESinspectorCLI
                     dropApp.QdbQualifiers = app.QdbQualifiers;
                     dropApp.quantity = app.quantity;
                     dropApp.VCdbAttributes = app.VCdbAttributes;
+                    dropApp.brand = app.brand;
+                    dropApp.subbrand = app.subbrand;
+
 
                     this.apps.Add(dropApp);
                 }
@@ -3328,6 +3336,11 @@ namespace ACESinspectorCLI
                     appTemp.part = (string)appElement.Element("Part");
                     if (ignoreNAitems && (appTemp.part == "NA" || appTemp.part == "NR" || appTemp.part == "N/A" || appTemp.part == "N/R" || appTemp.part == "")) { continue; } // skip place-holder part numbers like "NA"
 
+                    appTemp.brand = ""; appTemp.subbrand = "";
+                    XElement partElement = appElement.Element("Part");
+                    if (partElement.Attribute("BrandAAIAID") != null) { appTemp.brand = (string)partElement.Attribute("BrandAAIAID"); }
+                    if (partElement.Attribute("SubBrandAAIAID") != null) { appTemp.subbrand = (string)partElement.Attribute("SubBrandAAIAID"); }
+
                     appTemp.id = Convert.ToInt32(appElement.Attribute("id").Value);
                     xmlAppNodeCount++;
 
@@ -3592,6 +3605,8 @@ namespace ACESinspectorCLI
                         appToAdd.QdbQualifiers = appTemp.QdbQualifiers;
                         appToAdd.quantity = appTemp.quantity;
                         appToAdd.VCdbAttributes = appTemp.VCdbAttributes;
+                        appToAdd.brand = appTemp.brand;
+                        appToAdd.subbrand = appTemp.subbrand;
                         appToAdd.hash = appToAdd.appHash();
                         apps.Add(appToAdd);
                         vcdbUsageStatsTotalApps++;
