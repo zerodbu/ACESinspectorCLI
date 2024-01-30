@@ -1425,6 +1425,7 @@ namespace ACESinspectorCLI
             int prevalence = 0;
             List<string> fitmentElements = new List<string>();
             List<string> fitmentElementsTemp = new List<string>();
+            string fitmentElementsDictTempKey = "";
             Dictionary<int, List<String>> unconsumedFitmentByAttachmentPoint = new Dictionary<int, List<string>>();
             fitmentNode dummyNode = new fitmentNode();
             List<string> noteElementsList = new List<string>();
@@ -1439,12 +1440,20 @@ namespace ACESinspectorCLI
             foreach (QdbQualifier myQualifier in app.QdbQualifiers)
             {
                 prevalence = 0; fitmentElementPrevalence.TryGetValue("qdb-" + myQualifier.qualifierId.ToString(), out prevalence);
-                fitmentElementsDict.Add("qdb\t" + myQualifier.qualifierId.ToString() + ":" + String.Join(",", myQualifier.qualifierParameters.ToArray()), prevalence);
+                fitmentElementsDictTempKey = "qdb\t" + myQualifier.qualifierId.ToString() + ":" + String.Join(",", myQualifier.qualifierParameters.ToArray());
+                if (!fitmentElementsDict.ContainsKey(fitmentElementsDictTempKey))
+                {
+                    fitmentElementsDict.Add(fitmentElementsDictTempKey, prevalence);
+                }
             }
             foreach (String noteString in app.notes)
             {
                 prevalence = 0; fitmentElementPrevalence.TryGetValue("note-" + noteString, out prevalence);
-                fitmentElementsDict.Add("note\t" + noteString, prevalence);
+                fitmentElementsDictTempKey = "note\t" + noteString;
+                if (!fitmentElementsDict.ContainsKey(fitmentElementsDictTempKey))
+                {
+                    fitmentElementsDict.Add(fitmentElementsDictTempKey, prevalence);
+                }
                 noteElementsList.Add(noteString);
             }
 
@@ -3544,7 +3553,16 @@ namespace ACESinspectorCLI
                                 foundExistingQdbQualifier = true; break;
                             }
                         }
-                        if (!foundExistingQdbQualifier) { appTemp.QdbQualifiers.Add(QdbQualifierTemp); }
+
+                        if (!foundExistingQdbQualifier)
+                        { 
+                            appTemp.QdbQualifiers.Add(QdbQualifierTemp); 
+                        }
+                        else
+                        { // this Qdb id is already used in this app - technically ok, but poor form
+                          // maybe convert it to a note?
+                            appTemp.QdbQualifiers.Add(QdbQualifierTemp);
+                        }
 
                         if (!qdbidOccurrences.ContainsKey(QdbQualifierTemp.qualifierId))
                         {// first time seeing this qdbid

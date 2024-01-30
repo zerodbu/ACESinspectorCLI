@@ -1,5 +1,6 @@
 ﻿/*
  * Changes
+ * 1.0.0.18 (1/30/2024) added ability to accept multiple instances of the same qdbid on an app
  * 1.0.0.17 (10/6/2023) updated internal ACES schema 4.2 to the latest version of 4.2
  * 1.0.0.16 (7/31/2023) added support for brand/subbrand attributes (at app level) to resolve overlaps
  * 1.0.0.15 (3/5/2023)  added modern (1990+) basevid usage calculation
@@ -548,7 +549,7 @@ namespace ACESinspectorCLI
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">Qdb Utilization (%)</Data></Cell><Cell><Data ss:Type=\"Number\">" + aces.QdbUtilizationScore.ToString("0.00") + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">All BaseVehilce Coverage (%)</Data></Cell><Cell><Data ss:Type=\"Number\">" + Math.Round(Convert.ToDouble(basevehicleHitcount * 100) / (vcdb.vcdbBasevhicleDict.Count + 1), 1).ToString("0.00") + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\">" + basevehicleHitcount.ToString() + " used, " + vcdb.vcdbBasevhicleDict.Count.ToString() + " available" + "</Data></Cell></Row>");
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">1990+ BaseVehilce Coverage (%)</Data></Cell><Cell><Data ss:Type=\"Number\">" + Math.Round(Convert.ToDouble(modernBasevehicleHitcount * 100) / (modernBasevehiclesAvail + 1), 1).ToString("0.00") + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\">" + modernBasevehicleHitcount.ToString() + " used, " + modernBasevehiclesAvail.ToString() + " available" + "</Data></Cell></Row>");
-                    sw.Write("<Row><Cell><Data ss:Type=\"String\">Validation tool</Data></Cell><Cell ss:StyleID=\"s64\" ss:HRef=\"https://github.com/zerodbu/ACESinspectorCLI\"><Data ss:Type=\"String\">ACESinspectorCLI version 1.0.0.17</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
+                    sw.Write("<Row><Cell><Data ss:Type=\"String\">Validation tool</Data></Cell><Cell ss:StyleID=\"s64\" ss:HRef=\"https://github.com/zerodbu/ACESinspectorCLI\"><Data ss:Type=\"String\">ACESinspectorCLI version 1.0.0.18</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">Processing Time (Seconds)</Data></Cell><Cell><Data ss:Type=\"Number\">" + Math.Round(runTime.TotalMilliseconds / 1000, 1).ToString() + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
                     sw.Write("</Table><WorksheetOptions xmlns=\"urn:schemas-microsoft-com:office:excel\"><PageSetup><Header x:Margin=\"0.3\"/><Footer x:Margin=\"0.3\"/><PageMargins x:Bottom=\"0.75\" x:Left=\"0.7\" x:Right=\"0.7\" x:Top=\"0.75\"/></PageSetup><Selected/><ProtectObjects>False</ProtectObjects><ProtectScenarios>False</ProtectScenarios></WorksheetOptions></Worksheet>");
 
