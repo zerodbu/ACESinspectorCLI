@@ -1,5 +1,6 @@
 ﻿/*
  * Changes
+ * 1.0.0.19 (2/5/2024) added allowance for a year-range app that specifies MakeID but not a ModelID. Also changed useAssetsAsFitment to true. Added proper close of database files to avoid leaving .accdbl turds behind.
  * 1.0.0.18 (1/30/2024) added ability to accept multiple instances of the same qdbid on an app
  * 1.0.0.17 (10/6/2023) updated internal ACES schema 4.2 to the latest version of 4.2
  * 1.0.0.16 (7/31/2023) added support for brand/subbrand attributes (at app level) to resolve overlaps
@@ -16,6 +17,10 @@
  * 1.0.0.3  (2/28/2023) Defaulted to non-verbose console output and no delete of the input ACEC file on completion. Brandcode added to output
  * 1.0.0.0  (2/27/2023) forked code from main ACESinspector (GUI) project at version 1.2.0.48
  * 
+ * 
+ * 
+ * Example command-line call:
+ * C:\temp>ACESinspectorCLI.exe -i ACES.xml -o C:\temp\ -t C:\temp\AiFragments -v vcdb20230427.accdb -p pcdb20230427.accdb -q qdb20230427.accdb -l C:\temp --verbose
  * 
  * 
  * return values
@@ -145,7 +150,7 @@ namespace ACESinspectorCLI
 
             List<string> cacheFilesToDeleteOnExit = new List<string>();
 
-            bool useAssetsAsFitment = false;
+            bool useAssetsAsFitment = true; // changed this from false to true in v 1.0.0.19
             bool reportAllAppsInProblemGroup = false;
             bool concernForDisparate = false;
             bool respectQdbType = false;
@@ -249,7 +254,18 @@ namespace ACESinspectorCLI
             if (verbose) { Console.WriteLine("Importing ACES xml"); }
             if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tStarting ACES file import:" + aces.filePath + Environment.NewLine); }
 
-            int importedAppsCount = aces.importXML(inputFile, "", false, false, noteTranslationDictionary, noteToQdbTransformDictionary, vcdb);
+            int importedAppsCount = 0;
+            try
+            {
+
+                importedAppsCount = aces.importXML(inputFile, "", false, false, noteTranslationDictionary, noteToQdbTransformDictionary, vcdb);
+            }
+            catch (Exception ex)
+            {
+                if (verbose) { Console.WriteLine("Caught Error while importing XML:" + ex.Message); }
+                if (logFile != "") { File.AppendAllText(logFile, DateTime.Now.ToString() + "\tCaught Error while importing XML:" + ex.Message + Environment.NewLine); }
+                return 6; //failure - xml xsd validation
+            }
 
             if (importedAppsCount > 0)
             {
@@ -495,12 +511,12 @@ namespace ACESinspectorCLI
             int modernBasevehiclesAvail = 0;
             foreach (KeyValuePair<int, BaseVehicle> entry in vcdb.vcdbBasevhicleDict)
             {
-                if (Convert.ToInt32(entry.Value.YearId) >= 1990) { modernBasevehiclesAvail++; }
+                if (Convert.ToInt32(entry.Value.Year) >= 1990) { modernBasevehiclesAvail++; }
 
                 if (aces.basevidOccurrences.ContainsKey(entry.Key))
                 {
                     basevehicleHitcount++;
-                    if ( Convert.ToInt32(entry.Value.YearId) >= 1990) // && entry.Value.VehicleTypeName=="Car"
+                    if ( Convert.ToInt32(entry.Value.Year) >= 1990) // && entry.Value.VehicleTypeName=="Car"
                     {
                         //sw.WriteLine(entry.Key.ToString() + "\t" + entry.Value.MakeName + "\t" + entry.Value.ModelName + "\t" + entry.Value.YearId + "\t" + entry.Value.VehicleTypeName);
                         modernBasevehicleHitcount++;
@@ -549,7 +565,7 @@ namespace ACESinspectorCLI
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">Qdb Utilization (%)</Data></Cell><Cell><Data ss:Type=\"Number\">" + aces.QdbUtilizationScore.ToString("0.00") + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">All BaseVehilce Coverage (%)</Data></Cell><Cell><Data ss:Type=\"Number\">" + Math.Round(Convert.ToDouble(basevehicleHitcount * 100) / (vcdb.vcdbBasevhicleDict.Count + 1), 1).ToString("0.00") + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\">" + basevehicleHitcount.ToString() + " used, " + vcdb.vcdbBasevhicleDict.Count.ToString() + " available" + "</Data></Cell></Row>");
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">1990+ BaseVehilce Coverage (%)</Data></Cell><Cell><Data ss:Type=\"Number\">" + Math.Round(Convert.ToDouble(modernBasevehicleHitcount * 100) / (modernBasevehiclesAvail + 1), 1).ToString("0.00") + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\">" + modernBasevehicleHitcount.ToString() + " used, " + modernBasevehiclesAvail.ToString() + " available" + "</Data></Cell></Row>");
-                    sw.Write("<Row><Cell><Data ss:Type=\"String\">Validation tool</Data></Cell><Cell ss:StyleID=\"s64\" ss:HRef=\"https://github.com/zerodbu/ACESinspectorCLI\"><Data ss:Type=\"String\">ACESinspectorCLI version 1.0.0.18</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
+                    sw.Write("<Row><Cell><Data ss:Type=\"String\">Validation tool</Data></Cell><Cell ss:StyleID=\"s64\" ss:HRef=\"https://github.com/zerodbu/ACESinspectorCLI\"><Data ss:Type=\"String\">ACESinspectorCLI version 1.0.0.19</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
                     sw.Write("<Row><Cell><Data ss:Type=\"String\">Processing Time (Seconds)</Data></Cell><Cell><Data ss:Type=\"Number\">" + Math.Round(runTime.TotalMilliseconds / 1000, 1).ToString() + "</Data></Cell><Cell ss:StyleID=\"s62\"><Data ss:Type=\"String\"></Data></Cell></Row>");
                     sw.Write("</Table><WorksheetOptions xmlns=\"urn:schemas-microsoft-com:office:excel\"><PageSetup><Header x:Margin=\"0.3\"/><Footer x:Margin=\"0.3\"/><PageMargins x:Bottom=\"0.75\" x:Left=\"0.7\" x:Right=\"0.7\" x:Top=\"0.75\"/></PageSetup><Selected/><ProtectObjects>False</ProtectObjects><ProtectScenarios>False</ProtectScenarios></WorksheetOptions></Worksheet>");
 
