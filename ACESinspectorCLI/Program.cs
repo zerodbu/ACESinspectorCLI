@@ -1,5 +1,6 @@
 ﻿/*
  * Changes
+ * 1.0.0.20 (3/13/2024) fixed bug in year-range style apps modelid vs make id. Eric S. at NTN identified this one
  * 1.0.0.19 (2/5/2024) added allowance for a year-range app that specifies MakeID but not a ModelID. Also changed useAssetsAsFitment to true. Added proper close of database files to avoid leaving .accdbl turds behind.
  * 1.0.0.18 (1/30/2024) added ability to accept multiple instances of the same qdbid on an app
  * 1.0.0.17 (10/6/2023) updated internal ACES schema 4.2 to the latest version of 4.2

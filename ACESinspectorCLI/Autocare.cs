@@ -3372,7 +3372,7 @@ namespace ACESinspectorCLI
                         {// year-range style app. It may contain only makeid, but could also include modelid
 
                             int MakeIDtemp = 0; if (appElement.Element("Make") != null) { MakeIDtemp = Convert.ToInt32((string)appElement.Element("Make").Attribute("id").Value); }
-                            int ModelIDtemp = 0; if (appElement.Element("Model") != null) { MakeIDtemp = Convert.ToInt32((string)appElement.Element("Model").Attribute("id").Value); }
+                            int ModelIDtemp = 0; if (appElement.Element("Model") != null) { ModelIDtemp = Convert.ToInt32((string)appElement.Element("Model").Attribute("id").Value); }
                             if ((string)appElement.Element("Years").Attribute("from").Value != null && (string)appElement.Element("Years").Attribute("to").Value != null)
                             {
                                 basevidsInRange = vcdb.basevidsFromYearRange(MakeIDtemp, ModelIDtemp, Convert.ToInt32((string)appElement.Element("Years").Attribute("from").Value), Convert.ToInt32((string)appElement.Element("Years").Attribute("to").Value));
